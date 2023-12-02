@@ -19,4 +19,4 @@ executable AoC
   main-is:             Main.hs
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5, lens, parsec, containers, transformers, mtl, pqueue
-  default-extensions:  TupleSections, TemplateHaskell, FunctionalDependencies, LambdaCase
+  default-extensions:  TupleSections, TemplateHaskell, FunctionalDependencies, LambdaCase, FlexibleContexts

@@ -1,5 +1,6 @@
 module Harness where
 
+import Data.Either
 import Text.Parsec
 import Text.Parsec.String
 
@@ -15,6 +16,12 @@ runIO idx b p1 p2 = do
 
 runList :: (Show a, Read b) => Int -> Bool -> ([b] -> a) -> ([b] -> a) -> IO ()
 runList idx b p1 p2 = run idx b (p1 . map read . lines) (p2 . map read . lines)
+
+runParse :: (Show b) => Int -> Bool -> Parsec String () a -> (a -> b) -> (a -> b) -> IO ()
+runParse idx b p p1 p2 = do
+  f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
+  let pr = parse p "" f
+  either print (print . if b then p2 else p1) pr
 
 withRemaining :: Parser a -> Parser (a, String)
 withRemaining p = (,) <$> p <*> getInput
