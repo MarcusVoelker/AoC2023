@@ -30,15 +30,12 @@ p1 :: [Card] -> Int
 p1 cs = sum $ [2 ^ (l -1) | (i, a, b) <- cs, let l = length (a `intersect` b), l > 0]
 
 addCards :: M.Map Int Int -> (Int, Int) -> M.Map Int Int
-addCards m (i, c) =
-  let n = m M.! i
-   in foldr (M.adjust (+ n)) m [i + 1 .. i + c]
+addCards m (i, c) = foldr (M.adjust (+ (m M.! i))) m [i + 1 .. i + c]
 
 p2 :: [Card] -> Int
 p2 cs =
   let ns = map (\(i, a, b) -> (i, length (a `intersect` b))) cs
-      m = foldl addCards (M.fromList (map (\(i, _) -> (i, 1)) ns)) ns
-   in M.foldr (+) 0 m
+   in M.foldr (+) 0 $ foldl addCards (M.fromList (map (\(i, _) -> (i, 1)) ns)) ns
 
 main :: Bool -> IO ()
 main b = runParse 4 b cards p1 p2

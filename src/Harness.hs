@@ -1,6 +1,8 @@
 module Harness where
 
+import Control.Monad
 import Data.Either
+import Data.List
 import Text.Parsec
 import Text.Parsec.String
 
@@ -38,3 +40,15 @@ whileM b m = do
   if v
     then m >>= (\x -> (x :) <$> whileM b m)
     else return []
+
+neighbourhoods3 :: a -> [[a]] -> [((a, a, a), (a, a, a), (a, a, a))]
+neighbourhoods3 e cs =
+  let z1 = map (\l -> zip3 (e : l) l (tail l ++ [e])) cs
+      re = repeat (e, e, e)
+   in join (zipWith3 zip3 (re : z1) z1 (tail z1 ++ [re]))
+
+neighbourhoods5 :: a -> [[a]] -> [((a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a))]
+neighbourhoods5 e cs =
+  let z1 = map (\l -> zip5 (e : e : l) (e : l) l (tail l ++ [e]) (tail (tail l) ++ [e, e])) cs
+      re = repeat (e, e, e, e, e)
+   in join (zipWith5 zip5 (re : re : z1) (re : z1) z1 (tail z1 ++ [re]) (tail (tail z1) ++ [re, re]))
