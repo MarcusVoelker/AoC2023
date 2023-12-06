@@ -50,16 +50,17 @@ fullA = do
 p1 :: ([Integer], [[(Integer, Integer, Integer)]]) -> Integer
 p1 (ss, ms) = minimum (map (foldr1 (.) (reverse (map makeMap ms))) ss)
 
-intinterpret :: (Integer, Integer, Integer) -> (Integer, Integer) -> [(Integer, Integer)]
-intinterpret (d, s, w) (l, u)
-  | u < s || l >= s + w = [(l, u)]
-  | l < s && u >= s + w = [(l, s - 1), (d, d + w - 1), (s + w, u)]
-  | l < s && u >= s && u < s + w = [(l, s - 1), (d, u + (d - s))]
-  | l >= s && l < s + w && u >= s + w = [(l + (d - s), d + w - 1), (s + w, u)]
-  | otherwise = [(l + (d - s), u + (d - s))]
+intinterpret :: (Integer, Integer, Integer) -> (Bool, (Integer, Integer)) -> [(Bool, (Integer, Integer))]
+intinterpret _ (True, p) = [(True, p)]
+intinterpret (d, s, w) (False, (l, u))
+  | u < s || l >= s + w = [(False, (l, u))]
+  | l < s && u >= s + w = [(False, (l, s - 1)), (True, (d, d + w - 1)), (False, (s + w, u))]
+  | l < s && u >= s && u < s + w = [(False, (l, s - 1)), (True, (d, u + (d - s)))]
+  | l >= s && l < s + w && u >= s + w = [(True, (l + (d - s), d + w - 1)), (False, (s + w, u))]
+  | otherwise = [(True, (l + (d - s), u + (d - s)))]
 
 makeIMap :: [(Integer, Integer, Integer)] -> IMap
-makeIMap rs (l, u) = foldl (\is r -> is >>= intinterpret r) [(l, u)] rs
+makeIMap rs (l, u) = map snd $ foldl (\is r -> is >>= intinterpret r) [(False, (l, u))] rs
 
 initials :: [Integer] -> [(Integer, Integer)]
 initials (x : l : xs) = (x, x + l - 1) : initials xs
