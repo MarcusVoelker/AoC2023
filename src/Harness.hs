@@ -25,6 +25,12 @@ runParse idx b p p1 p2 = do
   let pr = parse p "" f
   either print (print . if b then p2 else p1) pr
 
+debugParse :: Int -> Bool -> Parsec String () a -> (a -> IO ()) -> (a -> IO ()) -> IO ()
+debugParse idx b p p1 p2 = do
+  f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
+  let pr = parse p "" f
+  either print (if b then p2 else p1) pr
+
 withRemaining :: Parser a -> Parser (a, String)
 withRemaining p = (,) <$> p <*> getInput
 
