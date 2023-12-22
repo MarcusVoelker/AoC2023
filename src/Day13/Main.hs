@@ -4,6 +4,7 @@ import Harness
 import Text.Parsec
 import Data.List
 import Data.Maybe
+import Data.Bifunctor
 import System.IO.Unsafe
 
 split :: String -> [[String]]
@@ -15,7 +16,7 @@ split s = let
 
 splits :: [a] -> [([a],[a])]
 splits [x,y] = [([x],[y])]
-splits (x:xs) = ([x],xs) : map (\(l,r) -> (x:l,r)) (splits xs)
+splits (x:xs) = ([x],xs) : map (first (x:)) (splits xs)
 
 overlaps :: (Eq a) => [a] -> [a] -> Bool
 overlaps l r = all (uncurry (==)) $ zip (reverse l) r

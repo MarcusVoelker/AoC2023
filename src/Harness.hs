@@ -5,6 +5,7 @@ import Data.Either
 import Data.List
 import Text.Parsec
 import Text.Parsec.String
+import System.IO.Unsafe
 
 run :: (Show a) => Int -> Bool -> (String -> a) -> (String -> a) -> IO ()
 run idx b p1 p2 = do
@@ -47,14 +48,29 @@ whileM b m = do
     then m >>= (\x -> (x :) <$> whileM b m)
     else return []
 
+lastM :: (Monad m) => m Bool -> m a -> m (Maybe a)
+lastM b m = whileM b m >>= (\l -> return $ if null l then Nothing else Just $ last l)
+
 neighbourhoods3 :: a -> [[a]] -> [((a, a, a), (a, a, a), (a, a, a))]
 neighbourhoods3 e cs =
   let z1 = map (\l -> zip3 (e : l) l (tail l ++ [e])) cs
       re = repeat (e, e, e)
    in join (zipWith3 zip3 (re : z1) z1 (tail z1 ++ [re]))
 
+neighbourhoods3Sq :: a -> [[a]] -> [[((a, a, a), (a, a, a), (a, a, a))]]
+neighbourhoods3Sq e cs =
+  let z1 = map (\l -> zip3 (e : l) l (tail l ++ [e])) cs
+      re = repeat (e, e, e)
+   in zipWith3 zip3 (re : z1) z1 (tail z1 ++ [re])
+
 neighbourhoods5 :: a -> [[a]] -> [((a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a), (a, a, a, a, a))]
 neighbourhoods5 e cs =
   let z1 = map (\l -> zip5 (e : e : l) (e : l) l (tail l ++ [e]) (tail (tail l) ++ [e, e])) cs
       re = repeat (e, e, e, e, e)
    in join (zipWith5 zip5 (re : re : z1) (re : z1) z1 (tail z1 ++ [re]) (tail (tail z1) ++ [re, re]))
+
+debugPrint :: (Show a) => a -> b -> b
+debugPrint a b = unsafePerformIO (print a >> return b)
+
+debugOut :: IO () -> b -> b
+debugOut a b = unsafePerformIO (a >> return b)
