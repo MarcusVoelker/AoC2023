@@ -7,24 +7,24 @@ import Text.Parsec
 import Text.Parsec.String
 import System.IO.Unsafe
 
-run :: (Show a) => Int -> Bool -> (String -> a) -> (String -> a) -> IO ()
+run :: (Show a, Show b) => Int -> Bool -> (String -> a) -> (String -> b) -> IO ()
 run idx b p1 p2 = do
   f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
-  print ((if b then p2 else p1) f)
+  if b then print $ p2 f else print $ p1 f
 
 runIO :: Int -> Bool -> (String -> IO ()) -> (String -> IO ()) -> IO ()
 runIO idx b p1 p2 = do
   f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
   (if b then p2 else p1) f
 
-runList :: (Show a, Read b) => Int -> Bool -> ([b] -> a) -> ([b] -> a) -> IO ()
+runList :: (Show a, Show c, Read b) => Int -> Bool -> ([b] -> a) -> ([b] -> c) -> IO ()
 runList idx b p1 p2 = run idx b (p1 . map read . lines) (p2 . map read . lines)
 
-runParse :: (Show b) => Int -> Bool -> Parsec String () a -> (a -> b) -> (a -> b) -> IO ()
+runParse :: (Show b, Show c) => Int -> Bool -> Parsec String () a -> (a -> b) -> (a -> c) -> IO ()
 runParse idx b p p1 p2 = do
   f <- readFile $ "inputs/in" ++ show idx ++ ".txt"
   let pr = parse p "" f
-  either print (print . if b then p2 else p1) pr
+  either print (if b then print . p2 else print . p1) pr
 
 debugParse :: Int -> Bool -> Parsec String () a -> (a -> IO ()) -> (a -> IO ()) -> IO ()
 debugParse idx b p p1 p2 = do
